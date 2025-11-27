@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Site de Carros - Carrinho e Login</title>
+  <style>
+    body { font-family: Helvetica, monospace; padding: 50px; background-color: #888686; }
+    h1, h2 { text-align: center; color: #1a1a1a; }
+    .container { max-width: 1200px; margin: auto; }
+    .form-container, #carrinho, .produto { background: #f9f9f9; padding: 20px; border-radius: 20px; margin-bottom: 30px; border: 3px solid #ca3333; }
+    .produto { display: flex; gap: 30px; align-items: flex-start; transition: 0.3s ease; }
+    .produto:hover { transform: scale(1.02); box-shadow: 0 0 18px rgba(202,51,51,0.6); }
+    .produto img { width: 200px; border-radius: 10px; flex-shrink: 0; }
+    .produto-info { width: 100%; }
+    .preco { font-size: 20px; font-weight: bold; color: #b30000; margin: 10px 0; }
+    button { padding: 10px 20px; background: #940707; color: #fff; border: none; cursor: pointer; border-radius: 12px; font-size: 16px; margin-top: 10px; }
+    button:hover { background: #c62828; }
+    button.remover { background: #b30000; }
+    button.remover:hover { background: #ff1a1a; }
+    #total { font-weight: bold; font-size: 22px; }
+    #pagamento select, #pagamento button, .form-container input { width: 100%; padding: 10px; margin-top: 10px; border-radius: 10px; box-sizing: border-box; }
+    #confirmacao { margin-top: 15px; font-weight: bold; font-size: 18px; color: green; }
+    .hidden { display: none; }
+    #logout { background: #333; margin-top: 10px; }
+    #logout:hover { background: #555; }
+    @media (max-width: 900px) { .produto { flex-direction: column; } .produto img { width: 100%; margin-bottom: 10px; } }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Loja de Carros</h1>
+
+    <!-- Login / Cadastro -->
+    <div id="loginContainer" class="form-container">
+      <h2>Login</h2>
+      <form id="formLogin">
+        <input type="email" id="loginEmail" placeholder="Email" required>
+        <input type="password" id="loginSenha" placeholder="Senha" required>
+        <button type="submit">Entrar</button>
+      </form>
+      <p>Não tem conta? <a href="#" id="mostrarCadastro">Cadastre-se</a></p>
+      <div id="mensagemLogin" style="color:red;"></div>
+    </div>
+
+    <div id="cadastroContainer" class="form-container hidden">
+      <h2>Cadastro</h2>
+      <form id="formCadastro">
+        <input type="text" id="cadNome" placeholder="Nome" required>
+        <input type="email" id="cadEmail" placeholder="Email" required>
+        <input type="password" id="cadSenha" placeholder="Senha" required>
+        <button type="submit">Cadastrar</button>
+      </form>
+      <p>Já tem conta? <a href="#" id="mostrarLogin">Login</a></p>
+      <div id="mensagemCadastro" style="color:green;"></div>
+    </div>
+
+    <!-- Área do usuário logado -->
+    <div id="userArea" class="hidden">
+      <h2 id="bemVindo"></h2>
+      <button id="logout">Sair</button>
+
+      <!-- Produtos -->
+      <div id="produtos">
+        <div class="produto" data-id="jaguar" data-preco="66120.00">
+          <img src="jaguar.jpg" alt="Carro Jaguar">
+          <div class="produto-info">
+            <h3>Jaguar XJ12 1995</h3>
+            <p class="preco">R$ 66.120,00</p>
+            <p>O Jaguar XJ12 1995 é um sedã de luxo que simboliza o clássico estilo e a engenharia britânica.</p>
+            <button>Adicionar ao Carrinho</button>
+          </div>
+        </div>
+
+        <div class="produto" data-id="mercedes" data-preco="28028.00">
+          <img src="1995-Mercedes-benz-C220.jpg" alt="Carro Mercedes">
+          <div class="produto-info">
+            <h3>Mercedes Benz C220 1995</h3>
+            <p class="preco">R$ 28.028,00</p>
+            <p>O Mercedes-Benz C220 de 1995 faz parte da primeira geração da Classe C (W202).</p>
+            <button>Adicionar ao Carrinho</button>
+          </div>
+        </div>
+
+        <div class="produto" data-id="bmw" data-preco="31666.00">
+          <img src="1995-bmw-m3.jpg" alt="BMW M3">
+          <div class="produto-info">
+            <h3>BMW M3</h3>
+            <p class="preco">R$ 31.666,00</p>
+            <p>O BMW M3 é uma versão de alta performance do sedã BMW Série 3.</p>
+            <button>Adicionar ao Carrinho</button>
+          </div>
+        </div>
+
+        <div class="produto" data-id="alfa" data-preco="29192.00">
+          <img src="1995-Alfa-Romeo.jpg" alt="Alfa Romeo">
+          <div class="produto-info">
+            <h3>Alfa Romeo V6 Super</h3>
+            <p class="preco">R$ 29.192,00</p>
+            <p>A versão "Super" tinha mais luxo e um motor V6 mais refinado.</p>
+            <button>Adicionar ao Carrinho</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Carrinho -->
+      <div id="carrinho">
+        Total no carrinho: <span id="total">R$ 0,00</span>
+        <div id="pagamento">
+          <label for="formaPagamento">Forma de pagamento:</label>
+          <select id="formaPagamento">
+            <option value="" disabled selected>Selecione</option>
+            <option value="debito">Cartão de Débito</option>
+            <option value="credito">Cartão de Crédito</option>
+            <option value="boleto">Boleto</option>
+            <option value="pix">Pix</option>
+          </select>
+          <button id="finalizarCompra" disabled>Finalizar Compra</button>
+          <div id="confirmacao"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // --- LOGIN / CADASTRO ---
+    const loginContainer = document.getElementById('loginContainer');
+    const cadastroContainer = document.getElementById('cadastroContainer');
+    const mostrarCadastroLink = document.getElementById('mostrarCadastro');
+    const mostrarLoginLink = document.getElementById('mostrarLogin');
+
+    mostrarCadastroLink.addEventListener('click', () => {
+      loginContainer.classList.add('hidden');
+      cadastroContainer.classList.remove('hidden');
+    });
+    mostrarLoginLink.addEventListener('click', () => {
+      cadastroContainer.classList.add('hidden');
+      loginContainer.classList.remove('hidden');
+    });
+
+    function cadastrarCliente(event) {
+      event.preventDefault();
+      const nome = document.getElementById('cadNome').value.trim();
+      const email = document.getElementById('cadEmail').value.trim();
+      const senha = document.getElementById('cadSenha').value.trim();
+      let clientes = JSON.parse(localStorage.getItem('clientes')) || [];
+      if (clientes.some(c => c.email === email)) {
+        document.getElementById('mensagemCadastro').textContent = 'Email já cadastrado!';
+        return;
+      }
+      clientes.push({ nome, email, senha });
+      localStorage.setItem('clientes', JSON.stringify(clientes));
+      document.getElementById('mensagemCadastro').textContent = 'Cadastro realizado com sucesso!';
+      document.getElementById('formCadastro').reset();
+    }
+
+    function loginCliente(event) {
+      event.preventDefault();
+      const email = document.getElementById('loginEmail').value.trim();
+      const senha = document.getElementById('loginSenha').value.trim();
+      const clientes = JSON.parse(localStorage.getItem('clientes')) || [];
+      const cliente = clientes.find(c => c.email === email && c.senha === senha);
+      if (cliente) {
+        localStorage.setItem('usuarioLogado', JSON.stringify(cliente));
+        initUserArea();
+      } else {
+        document.getElementById('mensagemLogin').textContent = 'Email ou senha incorretos!';
+      }
+    }
+
+    document.getElementById('formCadastro').addEventListener('submit', cadastrarCliente);
+    document.getElementById('formLogin').addEventListener('submit', loginCliente);
+
+    // --- USER AREA ---
+    const userArea = document.getElementById('userArea');
+    const bemVindo = document.getElementById('bemVindo');
+    const logoutBtn = document.getElementById('logout');
+
+    function initUserArea() {
+      const usuario = JSON.parse(localStorage.getItem('usuarioLogado'));
+      if (!usuario) {
+        loginContainer.classList.remove('hidden');
+        cadastroContainer.classList.add('hidden');
+        userArea.classList.add('hidden');
+        return;
+      }
+      bemVindo.textContent = `Bem-vindo, ${usuario.nome}!`;
+      loginContainer.classList.add('hidden');
+      cadastroContainer.classList.add('hidden');
+      userArea.classList.remove('hidden');
+      initCarrinho();
+    }
+
+    logoutBtn.addEventListener('click', () => {
+      localStorage.removeItem('usuarioLogado');
+      initUserArea();
+    });
+
+    // --- CARRINHO ---
+    let total = 0;
+    const botoes = document.querySelectorAll('.produto button');
+    const totalSpan = document.getElementById('total');
+    const formaPagamento = document.getElementById('formaPagamento');
+    const finalizarCompra = document.getElementById('finalizarCompra');
+    const confirmacao = document.getElementById('confirmacao');
+
+    function formatarMoeda(valor) {
+      return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    }
+
+    function atualizarTotal() {
+      totalSpan.textContent = formatarMoeda(total);
+      finalizarCompra.disabled = total === 0 || formaPagamento.value === '';
+    }
+
+    function initCarrinho() {
+      botoes.forEach(botao => {
+        botao.classList.remove('remover');
+        botao.textContent = 'Adicionar ao Carrinho';
+        botao.addEventListener('click', () => {
+          const produto = botao.closest('.produto');
+          const preco = parseFloat(produto.dataset.preco);
+          if (botao.classList.contains('remover')) {
+            total -= preco;
+            botao.textContent = 'Adicionar ao Carrinho';
+          } else {
+            total += preco;
+            botao.textContent = 'Remover do Carrinho';
+          }
+          botao.classList.toggle('remover');
+          atualizarTotal();
+          confirmacao.textContent = '';
+        });
+      });
+      formaPagamento.addEventListener('change', atualizarTotal);
+      finalizarCompra.addEventListener('click', () => {
+        if (total === 0) { alert('Carrinho vazio!'); return; }
+        confirmacao.textContent = `Compra finalizada! Pagamento: ${formaPagamento.options[formaPagamento.selectedIndex].text}. Total pago: ${formatarMoeda(total)}.`;
+        total = 0;
+        atualizarTotal();
+        botoes.forEach(botao => { botao.textContent = 'Adicionar ao Carrinho'; botao.classList.remove('remover'); });
+        formaPagamento.value = '';
+      });
+      atualizarTotal();
+    }
+
+    // Inicializa área do usuário ao carregar
+    window.addEventListener('load', initUserArea);
+  </script>
+</body>
+</html>
